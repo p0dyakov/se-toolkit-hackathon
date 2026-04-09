@@ -2,7 +2,7 @@ Rails.application.config.middleware.insert_before 0, Rack::Cors do
   allow do
     origins = [
       ENV.fetch("FRONTEND_URL", "http://localhost:5173"),
-      ENV["DOCS_URL"]
+      ENV.fetch("DOCS_URL", "https://docs.statementconverter.ru")
     ].compact
 
     origins(*origins)
