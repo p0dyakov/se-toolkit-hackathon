@@ -1,6 +1,6 @@
 # Bank Statement Converter
 
-Convert PDF bank statements into structured CSV and JSON with editable previews and personal API access.
+Turn PDF bank statements into structured exports for accounting workflows.
 
 ## Demo
 
@@ -24,16 +24,17 @@ Convert PDF bank statements into structured CSV and JSON with editable previews 
 
 ### End users
 
-- Students, freelancers, and small business users who need transaction data from PDF bank statements
-- Developers who want to automate statement conversion through an API
+- Accountants and bookkeepers
+- Finance admins and operations teams
+- Accounting, financial, and legal firms that work with client bank statements
 
 ### Problem that the product solves
 
-Bank statements are often provided as PDFs, which are difficult to reuse in spreadsheets, accounting workflows, or scripts. Manually retyping transactions is slow and error-prone.
+Bank statements usually arrive as PDFs, but accounting and review workflows require structured spreadsheet-ready data. Manually copying rows into Excel or CSV is repetitive, slow, and error-prone.
 
 ### Solution
 
-Bank Statement Converter lets a user upload a PDF bank statement, automatically extract structured transaction rows, review and edit the parsed result, and export the final data as CSV or JSON. The same functionality is also available through a documented API with personal bearer tokens.
+Bank Statement Converter is a utility SaaS that lets users upload a PDF bank statement, automatically extract transaction rows, review and edit the parsed result, and export the final data as CSV or JSON. The product is designed for fast self-serve processing of accounting documents, with the same functionality available through a documented API and personal bearer tokens.
 
 ## Features
 
@@ -110,6 +111,10 @@ Included in Version 2:
 - Added a clearer end-user flow from upload to export
 - Added developer-facing API access and documentation
 - Improved deployability and project presentation quality
+
+## Market positioning
+
+Bank Statement Converter is best positioned as a niche document-conversion SaaS for accountants and finance/legal operations teams. The product sells fast turnaround and structured exports, not “AI for its own sake”. The value is throughput and time saved on real operational work.
 
 ## Tech stack
 
