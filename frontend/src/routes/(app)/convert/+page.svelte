@@ -1,4 +1,6 @@
 <script lang="ts">
+	import CheckIcon from '@lucide/svelte/icons/check';
+	import CopyIcon from '@lucide/svelte/icons/copy';
 	import EyeIcon from '@lucide/svelte/icons/eye';
 	import Loader2Icon from '@lucide/svelte/icons/loader-2';
 	import PlusIcon from '@lucide/svelte/icons/plus';
@@ -42,6 +44,9 @@
 	let previewSaveTimeout = $state<ReturnType<typeof setTimeout> | null>(null);
 	let deleteDialogOpen = $state(false);
 	let conversionPendingDelete = $state<Conversion | null>(null);
+	let copyingCsvConversionId = $state<number | null>(null);
+	let copiedCsvConversionId = $state<number | null>(null);
+	let copiedCsvResetTimeout = $state<ReturnType<typeof setTimeout> | null>(null);
 
 	const filteredConversions = $derived.by(() => {
 		const query = searchQuery.trim().toLowerCase();
@@ -209,6 +214,40 @@
 		}
 
 		window.location.assign(absoluteBackendUrl(path));
+	}
+
+	async function copyCsv(conversion: Conversion) {
+		if (!conversion.download_url || copyingCsvConversionId === conversion.id) return;
+
+		copyingCsvConversionId = conversion.id;
+
+		try {
+			const response = await fetch(absoluteBackendUrl(conversion.download_url), {
+				credentials: 'include'
+			});
+
+			if (!response.ok) {
+				throw new Error('Could not load CSV export.');
+			}
+
+			const csv = await response.text();
+			await navigator.clipboard.writeText(csv);
+			copiedCsvConversionId = conversion.id;
+
+			if (copiedCsvResetTimeout) {
+				clearTimeout(copiedCsvResetTimeout);
+			}
+
+			copiedCsvResetTimeout = setTimeout(() => {
+				copiedCsvConversionId = null;
+				copiedCsvResetTimeout = null;
+			}, 1500);
+		} catch (error) {
+			console.error(error);
+			toast.error('Could not copy CSV.');
+		} finally {
+			copyingCsvConversionId = null;
+		}
 	}
 
 	async function openPreview(conversion: Conversion) {
@@ -432,6 +471,23 @@
 									</Button>
 									<Button
 										variant="outline"
+										size="icon-sm"
+										class="shrink-0"
+										disabled={!conversion.download_url}
+										aria-label="Copy CSV to clipboard"
+										title="Copy CSV to clipboard"
+										onclick={() => copyCsv(conversion)}
+									>
+										{#if copyingCsvConversionId === conversion.id}
+											<Loader2Icon class="size-3.5 animate-spin" />
+										{:else if copiedCsvConversionId === conversion.id}
+											<CheckIcon class="size-3.5" />
+										{:else}
+											<CopyIcon class="size-3.5" />
+										{/if}
+									</Button>
+									<Button
+										variant="outline"
 										size="sm"
 										disabled={!conversion.json_download_url}
 										onclick={() => openDownload(conversion.json_download_url)}
@@ -512,18 +568,35 @@
 											>
 												PDF
 											</Button>
-											<Button
-												variant="outline"
-												size="sm"
-												disabled={!conversion.download_url}
-												onclick={() => openDownload(conversion.download_url)}
-											>
-												CSV
-											</Button>
-											<Button
-												variant="outline"
-												size="sm"
-												disabled={!conversion.json_download_url}
+										<Button
+											variant="outline"
+											size="sm"
+											disabled={!conversion.download_url}
+											onclick={() => openDownload(conversion.download_url)}
+										>
+											CSV
+										</Button>
+										<Button
+											variant="outline"
+											size="icon-sm"
+											class="shrink-0"
+											disabled={!conversion.download_url}
+											aria-label="Copy CSV to clipboard"
+											title="Copy CSV to clipboard"
+											onclick={() => copyCsv(conversion)}
+										>
+											{#if copyingCsvConversionId === conversion.id}
+												<Loader2Icon class="size-3.5 animate-spin" />
+											{:else if copiedCsvConversionId === conversion.id}
+												<CheckIcon class="size-3.5" />
+											{:else}
+												<CopyIcon class="size-3.5" />
+											{/if}
+										</Button>
+										<Button
+											variant="outline"
+											size="sm"
+											disabled={!conversion.json_download_url}
 												onclick={() => openDownload(conversion.json_download_url)}
 											>
 												JSON

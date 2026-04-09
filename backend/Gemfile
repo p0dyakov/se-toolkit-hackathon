@@ -10,12 +10,12 @@ gem "omniauth-google-oauth2"
 gem "pdf-reader"
 gem "roo"
 
-gem "tzinfo-data", platforms: %i[ windows jruby ]
+gem "tzinfo-data", platforms: %i[ mingw mswin x64_mingw jruby ]
 gem "bootsnap", require: false
 
 group :development, :test do
   gem "dotenv-rails"
-  gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
+  gem "debug", platforms: %i[ mri mingw mswin x64_mingw ], require: "debug/prelude"
   gem "rspec-rails"
   gem "rswag-api"
   gem "rswag-specs"

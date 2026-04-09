@@ -162,7 +162,9 @@ module Api
       end
 
       def attach_json_export(conversion, json_body)
-        File.write(json_export_path(conversion), json_body)
+        path = json_export_path(conversion)
+        FileUtils.mkdir_p(path.dirname)
+        File.write(path, json_body)
       end
 
       def download_json_export(conversion)
