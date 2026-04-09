@@ -6,19 +6,19 @@ Convert PDF bank statements into structured CSV and JSON with editable previews 
 
 ### Web app dashboard
 
-![Convert dashboard](docs/screenshots/convert-dashboard.png)
+![Convert dashboard](docs/screenshots/1.png)
 
 ### Profile with API key and code examples
 
-![Profile API key](docs/screenshots/profile-api-key.png)
+![Profile API key](docs/screenshots/4.png)
 
 ### Interactive API documentation
 
-![API docs](docs/screenshots/api-docs.png)
+![API docs](docs/screenshots/3.png)
 
 ### Editable conversion preview
 
-![Conversion preview editor](docs/screenshots/conversion-preview-editor.png)
+![Conversion preview editor](docs/screenshots/2.png)
 
 ## Product context
 
