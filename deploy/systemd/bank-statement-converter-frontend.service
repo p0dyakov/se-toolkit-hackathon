@@ -1,0 +1,20 @@
+[Unit]
+Description=Bank Statement Converter Svelte Frontend
+After=network.target
+
+[Service]
+Type=simple
+User=p0dyakov
+WorkingDirectory=/home/p0dyakov/bank_statement_converter/frontend
+Environment=HOST=127.0.0.1
+Environment=PORT=3100
+Environment=ORIGIN=https://statementconverter.ru
+Environment=PUBLIC_API_BASE_URL=https://api.statementconverter.ru
+ExecStart=/usr/local/bin/node build/index.js
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

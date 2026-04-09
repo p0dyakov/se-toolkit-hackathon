@@ -1,0 +1,258 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Bank Statement Converter API",
+    "version": "v1",
+    "description": "API for Google authentication, profile management, personal API keys, bank statement conversion, preview editing, and export downloads."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000"
+    }
+  ],
+  "paths": {
+    "/api/v1/me": {
+      "get": {
+        "summary": "Get current profile",
+        "description": "Returns the authenticated user profile together with language-specific API code samples.",
+        "responses": {
+          "200": {
+            "description": "Profile returned successfully"
+          },
+          "401": {
+            "description": "Authentication is required"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete current account",
+        "description": "Deletes the authenticated user account together with all conversions and files.",
+        "responses": {
+          "204": {
+            "description": "Account deleted successfully"
+          },
+          "401": {
+            "description": "Authentication is required"
+          }
+        }
+      }
+    },
+    "/api/v1/me/api-key": {
+      "post": {
+        "summary": "Rotate personal API key",
+        "description": "Generates a new bearer token for programmatic PDF uploads and invalidates the previous key.",
+        "responses": {
+          "201": {
+            "description": "API key rotated successfully"
+          },
+          "401": {
+            "description": "Authentication is required"
+          }
+        }
+      }
+    },
+    "/api/v1/session": {
+      "delete": {
+        "summary": "Log out current session",
+        "description": "Clears the authenticated browser session.",
+        "responses": {
+          "204": {
+            "description": "Session cleared successfully"
+          },
+          "401": {
+            "description": "Authentication is required"
+          }
+        }
+      }
+    },
+    "/api/v1/conversions": {
+      "get": {
+        "summary": "List conversion history",
+        "description": "Returns all conversions for the authenticated user ordered by creation date.",
+        "responses": {
+          "200": {
+            "description": "Conversion history returned successfully"
+          },
+          "401": {
+            "description": "Authentication is required"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a conversion",
+        "description": "Uploads one PDF bank statement, converts it into structured rows, and generates CSV and JSON exports on the backend.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": ["file"],
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Conversion created successfully"
+          },
+          "401": {
+            "description": "Authentication is required"
+          },
+          "422": {
+            "description": "The uploaded file is invalid or could not be converted"
+          }
+        }
+      }
+    },
+    "/api/v1/conversions/{id}": {
+      "get": {
+        "summary": "Get conversion details",
+        "description": "Returns one conversion record for the authenticated user including preview headers and editable rows.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Conversion returned successfully"
+          },
+          "401": {
+            "description": "Authentication is required"
+          },
+          "404": {
+            "description": "Conversion was not found"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update preview rows",
+        "description": "Persists manually edited preview rows and regenerates the CSV and JSON exports.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Preview updated successfully"
+          },
+          "401": {
+            "description": "Authentication is required"
+          },
+          "422": {
+            "description": "Preview data is invalid"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete conversion",
+        "description": "Deletes the conversion record and removes the original PDF and generated export files.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Conversion deleted successfully"
+          },
+          "401": {
+            "description": "Authentication is required"
+          }
+        }
+      }
+    },
+    "/api/v1/conversions/{id}/download": {
+      "get": {
+        "summary": "Download export",
+        "description": "Downloads the generated CSV export by default. Pass `format_type=json` to download JSON.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "format_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["json"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Export downloaded successfully"
+          },
+          "401": {
+            "description": "Authentication is required"
+          },
+          "404": {
+            "description": "Conversion was not found"
+          },
+          "422": {
+            "description": "The requested export is not available"
+          }
+        }
+      }
+    },
+    "/api/v1/conversions/{id}/download_source": {
+      "get": {
+        "summary": "Download original PDF",
+        "description": "Downloads the original uploaded PDF file for a conversion.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Source PDF downloaded successfully"
+          },
+          "401": {
+            "description": "Authentication is required"
+          },
+          "404": {
+            "description": "Conversion was not found"
+          },
+          "422": {
+            "description": "The source PDF is not available"
+          }
+        }
+      }
+    }
+  }
+}

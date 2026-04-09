@@ -1,0 +1,23 @@
+[Unit]
+Description=Bank Statement Converter Rails API
+After=network.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+Type=simple
+User=p0dyakov
+WorkingDirectory=/home/p0dyakov/bank_statement_converter/backend
+Environment=HOME=/home/p0dyakov
+Environment=PATH=/usr/local/bin:/usr/bin:/bin:/var/lib/gems/3.2.0/bin:/home/p0dyakov/.local/share/gem/ruby/3.2.0/bin
+Environment=RAILS_ENV=production
+Environment=PIDFILE=/home/p0dyakov/bank_statement_converter/backend/tmp/pids/puma.pid
+EnvironmentFile=/home/p0dyakov/bank_statement_converter/.env.production
+ExecStartPre=/bin/bash -lc 'mkdir -p /home/p0dyakov/bank_statement_converter/backend/tmp/pids'
+ExecStart=/bin/bash -lc 'bundle exec puma -e production -b tcp://127.0.0.1:3101'
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
