@@ -1,101 +1,148 @@
 # Bank Statement Converter
 
-Monorepo with:
+Convert PDF bank statements into structured CSV and JSON with editable previews and personal API access.
 
-- `backend/` - Ruby on Rails API, Google OAuth, OpenRouter conversion, OpenAPI/Scalar docs
-- `frontend/` - SvelteKit + Bun + Vite + TypeScript + shadcn-svelte UI
-- `deploy/` - nginx, docs host, and `systemd` unit files for production
+## Demo
+
+### Web app dashboard
+
+![Convert dashboard](docs/screenshots/convert-dashboard.png)
+
+### Profile with API key and code examples
+
+![Profile API key](docs/screenshots/profile-api-key.png)
+
+### Interactive API documentation
+
+![API docs](docs/screenshots/api-docs.png)
+
+### Editable conversion preview
+
+![Conversion preview editor](docs/screenshots/conversion-preview-editor.png)
+
+## Product context
+
+### End users
+
+- Students, freelancers, and small business users who need transaction data from PDF bank statements
+- Developers who want to automate statement conversion through an API
+
+### Problem that the product solves
+
+Bank statements are often provided as PDFs, which are difficult to reuse in spreadsheets, accounting workflows, or scripts. Manually retyping transactions is slow and error-prone.
+
+### Solution
+
+Bank Statement Converter lets a user upload a PDF bank statement, automatically extract structured transaction rows, review and edit the parsed result, and export the final data as CSV or JSON. The same functionality is also available through a documented API with personal bearer tokens.
 
 ## Features
 
+### Implemented features
+
 - Google sign-in
-- Batch PDF upload
-- Automatic conversion after upload
+- PDF upload through the web interface
+- Automatic conversion right after upload
 - Conversion history with search and filters
-- Editable preview before export
-- CSV and JSON exports
-- User profile with personal API key and code examples
+- Editable preview table before export
+- CSV and JSON export download
+- Personal API key for each user
+- API usage examples in several languages
+- Public OpenAPI / Scalar API documentation
+- Production deployment with frontend, backend, database, and docs host
 
-## Local Run
+### Not yet implemented
 
-### Backend
+- Support for more bank-specific parsing presets
+- Better validation for ambiguous or low-confidence rows
+- Bulk export operations across multiple conversions
+- Admin analytics and monitoring dashboard
 
-```bash
-cd backend
-bundle install
-cp .env.example .env
-bin/rails db:prepare
-bin/rails server
-```
+## Usage
 
-Backend runs at `http://localhost:3000`.
+### Web app
 
-Required variables in `backend/.env`:
+1. Open the deployed product: [statementconverter.ru](https://statementconverter.ru)
+2. Sign in with Google
+3. Upload one or more PDF bank statements
+4. Wait for automatic processing
+5. Open preview, correct rows if needed
+6. Download CSV or JSON
 
-- `GOOGLE_CLIENT_ID`
-- `GOOGLE_CLIENT_SECRET`
-- `OPENROUTER_API_KEY`
+### API
 
-### Frontend
+1. Sign in to the web app
+2. Open the `Profile` page
+3. Copy your personal API key
+4. Open the API docs: [docs.statementconverter.ru](https://docs.statementconverter.ru)
+5. Call `POST /api/v1/conversions` with `Authorization: Bearer <token>` and a PDF file
 
-```bash
-cd frontend
-bun install
-bun run dev
-```
+## Version 1 and Version 2
 
-Frontend runs at `http://localhost:5173`.
+### Version 1
 
-## Google OAuth
+Version 1 focused on one core feature: upload a PDF bank statement and convert it into structured export data.
 
-Create a Google OAuth 2.0 Web application and add:
+Included in Version 1:
 
-- Authorized JavaScript origin: `http://localhost:5173`
-- Authorized JavaScript origin: `http://localhost:3000`
-- Authorized redirect URI: `http://localhost:3000/auth/google_oauth2/callback`
+- Google authentication
+- PDF upload
+- backend conversion flow
+- basic conversion history
+- CSV / JSON export
 
-## API Docs
+### Version 2
 
-- Scalar UI: `http://localhost:3000/api-docs`
-- OpenAPI JSON: `http://localhost:3000/openapi/v1/openapi.json`
+Version 2 expanded the product into a more complete and polished tool.
 
-## Checks
+Included in Version 2:
 
-### Backend
+- automatic processing after upload
+- editable preview before export
+- search and filtering in conversion history
+- personal API keys
+- language-specific API examples in the profile
+- public API docs with Scalar / OpenAPI
+- production deployment on a VM with nginx, systemd, and PostgreSQL
 
-```bash
-cd backend
-bundle exec rspec
-```
+### TA feedback addressed
 
-### Frontend
+- Improved product polish instead of keeping a rough prototype
+- Added a clearer end-user flow from upload to export
+- Added developer-facing API access and documentation
+- Improved deployability and project presentation quality
 
-```bash
-cd frontend
-bun run check
-bun run test
-bun run build
-bun run lint
-```
+## Tech stack
 
-## Production
+- Frontend: SvelteKit, TypeScript, Vite, shadcn-svelte
+- Backend: Ruby on Rails API
+- Database: PostgreSQL
+- Auth: Google OAuth 2.0
+- AI processing: OpenRouter-powered statement conversion
+- Docs: OpenAPI + Scalar
+- Deployment: Ubuntu 24.04, nginx, systemd
 
-Current production layout:
+## Deployment
 
-- `statementconverter.ru` -> frontend
-- `api.statementconverter.ru` -> Rails API
-- `docs.statementconverter.ru` -> Scalar docs
+### Target OS
 
-Server stack:
+- Ubuntu 24.04
+
+### What should be installed on the VM
 
 - nginx
-- Rails API as `systemd` service
-- SvelteKit Node server as `systemd` service
+- Node.js
+- Ruby
+- Bundler
 - PostgreSQL
+- systemd
 
-### Production env
+### Environment configuration
 
-Create `.env.production` from `.env.production.example` and fill:
+Create and fill the production environment file from:
+
+- `.env.production.example`
+
+Important variables:
 
 - `FRONTEND_URL`
 - `APP_URL`
@@ -109,56 +156,78 @@ Create `.env.production` from `.env.production.example` and fill:
 - `DATABASE_URL`
 - `RAILS_MASTER_KEY`
 
-### Services
+### Step-by-step deployment
 
-Copy the unit files from `deploy/systemd/` into `/etc/systemd/system/`, then run:
-
-```bash
-sudo systemctl daemon-reload
-sudo systemctl enable --now bank-statement-converter-backend
-sudo systemctl enable --now bank-statement-converter-frontend
-```
-
-### nginx
-
-Copy:
-
-- `deploy/nginx/nginx.conf`
-- `deploy/nginx/conf.d/default.conf`
-- `deploy/docs/index.html`
-
-Then reload nginx:
+1. Copy the project to the server.
+2. Configure the production environment variables.
+3. Install backend dependencies:
 
 ```bash
-sudo nginx -t
-sudo systemctl reload nginx
+cd backend
+bundle install
+RAILS_ENV=production bundle exec rails db:migrate
 ```
 
-### Update
+4. Install frontend dependencies and build:
 
 ```bash
 cd frontend
 bun install
 bun run build
+```
 
-cd ../backend
-bundle install
-RAILS_ENV=production bundle exec rails db:migrate
+5. Copy the systemd units from `deploy/systemd/` into `/etc/systemd/system/`.
+6. Copy nginx config from `deploy/nginx/` and docs host files from `deploy/docs/`.
+7. Enable and start services:
 
-sudo systemctl restart bank-statement-converter-frontend
-sudo systemctl restart bank-statement-converter-backend
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable --now bank-statement-converter-backend
+sudo systemctl enable --now bank-statement-converter-frontend
+sudo nginx -t
 sudo systemctl reload nginx
 ```
 
-### Logs
+### Production URLs
+
+- Product: [statementconverter.ru](https://statementconverter.ru)
+- API: [api.statementconverter.ru](https://api.statementconverter.ru)
+- Docs: [docs.statementconverter.ru](https://docs.statementconverter.ru)
+
+## Local development
+
+### Backend
 
 ```bash
-journalctl -u bank-statement-converter-frontend -f
-journalctl -u bank-statement-converter-backend -f
-sudo tail -f /var/log/nginx/access.log /var/log/nginx/error.log
+cd backend
+bundle install
+cp .env.example .env
+bin/rails db:prepare
+bin/rails server
 ```
 
-## Data
+### Frontend
 
-- uploaded PDFs and generated exports: `backend/storage/`
-- docs static host: `/var/www/bank-statement-converter-docs/`
+```bash
+cd frontend
+bun install
+bun run dev
+```
+
+### Checks
+
+Backend:
+
+```bash
+cd backend
+bundle exec rspec
+```
+
+Frontend:
+
+```bash
+cd frontend
+bun run check
+bun run test
+bun run build
+```
