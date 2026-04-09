@@ -6,7 +6,8 @@ Rails.application.config.middleware.use OmniAuth::Builder do
       scope: "email,profile",
       prompt: "select_account",
       image_aspect_ratio: "square",
-      image_size: 96
+      image_size: 96,
+      provider_ignores_state: true
     }
 end
 
